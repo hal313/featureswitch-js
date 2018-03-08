@@ -4,5 +4,7 @@ node_js:
   - '5'
   - '4'
 script:
-  - npm run test
+  - npm install -g ts-node typescript mocha
+  ## - npm run test <-- This does not work through npm
+  - mocha test/**.ts --require ts-node/register
   - npm run bundle
