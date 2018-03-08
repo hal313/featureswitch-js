@@ -1,7 +1,7 @@
 {
-  "name": "library.ts",
+  "name": "featureswitch-js",
   "version": "1.0.0",
-  "description": "TypeScript Library Template using Webpack + Karma for cross-browser testing.",
+  "description": "TypeScript library which implements feature switches",
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/endel/library.ts.git"
+    "url": "git+https://github.com/hal313/featureswitch-js.git"
   },
   "keywords": [
     "typescript",
@@ -20,12 +20,12 @@
     "module",
     "authoring"
   ],
-  "author": "Endel Dreyer",
+  "author": "John Ghidiu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/endel/library.ts/issues"
+    "url": "https://github.com/hal313/featureswitch-js/issues"
   },
-  "homepage": "https://github.com/endel/library.ts#readme",
+  "homepage": "https://github.com/hal313/featureswitch-js#readme",
   "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/mocha": "^2.2.48",
