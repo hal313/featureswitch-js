@@ -686,6 +686,29 @@ describe('FeatureManager', () => {
 
     });
 
+    describe('removeAllFeatures', () => {
+
+      it('should remove all features', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        FeatureManager.removeAllFeatures();
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getAllFeatures().length, 0);
+      });
+
+    });
+
   });
 
 });
