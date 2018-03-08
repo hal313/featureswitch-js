@@ -11,6 +11,7 @@
 // TODO: Identifier functions should be able to return featurish objects
 // TODO: addSource() should take any[], Feature[] or FeatureDescriptor[]
 // TODO: addFeatures() should take any[]
+// TODO: removeFeature/removeFeatures should take any[]
 // TODO: setFeatures should take any[] | () => any[]
 // TODO: FeatureManager should be simple (no descriptors)
 // TODO: FeatureManager should be simple (no descriptors) (interface, default implementation)
@@ -78,13 +79,6 @@ export class FeatureManager {
                 }
         }
 
-        public static removeFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
-                if (FeatureManager.isFunction(featureIdentifier)) {
-                        FeatureManager.removeFeature(featureIdentifier(FeatureManager.getContext()));
-                } else {
-                        delete FeatureManager.FEATURES[FeatureManager.getName(featureIdentifier)];
-                }
-        }
         public static removeFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): void {
                 if (FeatureManager.isFunction(featureIdentifiers)) {
                         FeatureManager.removeFeatures(featureIdentifiers(FeatureManager.getContext()));
@@ -94,6 +88,13 @@ export class FeatureManager {
                         featureIdentifiers.forEach(FeatureManager.removeFeature);
                 } else {
                         throw new Error(`Unknown feature identifier type '${typeof featureIdentifiers}'`);
+                }
+        }
+        public static removeFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
+                if (FeatureManager.isFunction(featureIdentifier)) {
+                        FeatureManager.removeFeature(featureIdentifier(FeatureManager.getContext()));
+                } else {
+                        delete FeatureManager.FEATURES[FeatureManager.getName(featureIdentifier)];
                 }
         }
         public static removeAllFeatures(): void {
