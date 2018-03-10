@@ -8,6 +8,7 @@
 
 // FILE
 // TODO: Union types for identifiers?
+// TODO: setContext()/getContext() should clone the context (and preserve functions) / allow behavior change [UPDATE TEST]
 // TODO: Identifier functions should be able to return featurish objects
 // TODO: addSource() should take any[], Feature[] or FeatureDescriptor[]
 // TODO: addFeatures() should take any[]
@@ -107,7 +108,7 @@ export class FeatureManager {
         public static setContext(context: Object): void {
                 // Do not clone (we will not get functions if we clone)
                 // FeatureManager.CONTEXT = FeatureManager.clone(context);
-                FeatureManager.CONTEXT = context;
+                FeatureManager.CONTEXT = context || {};
         }
         public static getContext(): Object {
                 // Do not clone (we will not get functions if we clone)
@@ -194,7 +195,7 @@ export class FeatureManager {
                                 featureDescriptor.toggleCount--;
                         }
                 } else {
-                        throw new Error(`Cannot set enabled '${enabled}' on feature '${name}'`);
+                        throw new Error(`Cannot set enabled '${enabled}' on feature '${feature.getName()}'`);
                 } 
         }
 
@@ -206,7 +207,7 @@ export class FeatureManager {
                         return FeatureManager.normalizeValue(defaultValue);
                 }
         }
-        public static ifNotEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object) => any | any) = undefined): any {
+        public static ifDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object) => any | any) = undefined): any {
                 let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
                 if (!FeatureManager.isEnabled(featureDescriptor)) {
                         return fn.call({}, args, FeatureManager.getContext());
