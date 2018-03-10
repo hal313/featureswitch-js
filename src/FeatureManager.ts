@@ -1,18 +1,22 @@
 // CODE QUALITY
+// TODO: Use defaultValue, context in getValue()
+// TODO: Use context in isEnabled()
+// TODO: Use context in canSetEnabled()
 // TODO: Check parameters (include descriptors and function returns)
-// TODO: Check that all functions take in Feature|FeatureDescriptor|()=>Feature|FeatureDescriptor as appropriate
+// TODO: Check that all functions take in Feature|FeatureDescriptor|any|()=>Feature|FeatureDescriptor|any as appropriate
 // TODO: Order if/else/else if
 // TODO: Check TODO's
 // TODO: this => FeatureManager
 // TODO: Use getName(string|Feature|FeatureDescriptor|()=>string|Feature|FeatureDescriptor)
+// TODO: Use "object" instead of "Object" [https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html]
 
 // FILE
+// TODO: Add private static clearFeatures(): void {FeatureManager.FEATURES = {};}
+// TODO: Get rid of static? Use default instance for static? Support named instances?
 // TODO: Union types for identifiers?
-// TODO: setContext()/getContext() should clone the context (and preserve functions) / allow behavior change [UPDATE TEST]
 // TODO: Identifier functions should be able to return featurish objects
 // TODO: addSource() should take any[], Feature[] or FeatureDescriptor[]
 // TODO: addFeatures() should take any[]
-// TODO: removeFeature/removeFeatures should take any[]
 // TODO: setFeatures should take any[] | () => any[]
 // TODO: FeatureManager should be simple (no descriptors)
 // TODO: FeatureManager should be simple (no descriptors) (interface, default implementation)
@@ -36,10 +40,6 @@ export class FeatureManager {
 
         private static FEATURES:any  = {};
         private static CONTEXT = {};
-
-        // private static clearFeatures(): void {
-        //         FeatureManager.FEATURES = {};
-        // }
 
         public static addSource(name: string, source: (context: Object) => Feature[] | FeatureDescriptor[]) {
                 let results = source(FeatureManager.getContext());
@@ -156,6 +156,9 @@ export class FeatureManager {
 
                 return features;
         }
+        public static hasFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                return !!FeatureManager.getFeatureDescriptor(featureIdentifier);
+        }
         public static hasValue(featureIdentifier: string | Feature | FeatureDescriptor, context: Object = undefined): boolean {
                 return undefined !== FeatureManager.getValue(FeatureManager.getFeature(featureIdentifier).getName(), null, context);
         }
@@ -167,7 +170,10 @@ export class FeatureManager {
         }
 
         public static isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
-                return undefined !== FeatureManager.getFeatureDescriptor(featureIdentifier).enabled;
+                return FeatureManager.getFeatureDescriptor(featureIdentifier).enabled;
+        }
+        public static isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
+                return !FeatureManager.isEnabled(featureIdentifier, context);
         }
         public static canEnable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
                 return FeatureManager.canSetEnabled(featureIdentifier);
@@ -190,7 +196,7 @@ export class FeatureManager {
                 let feature = featureDescriptor.getFeature();
                 
                 if (FeatureManager.canSetEnabled(feature)) {
-                        featureDescriptor.enabled = !!enabled;
+                        featureDescriptor.enabled = enabled;
                         if (featureDescriptor.toggleCount > 0) {
                                 featureDescriptor.toggleCount--;
                         }
@@ -199,7 +205,7 @@ export class FeatureManager {
                 } 
         }
 
-        public static ifEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabledFunction: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object)=>any | any)=undefined): any {
+        public static ifEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabledFunction: ((args: any[], context: Object) => any), args: any[] = null, defaultValue: any | ((context: Object)=>any)=undefined): any {
                 let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
                 if (FeatureManager.isEnabled(featureDescriptor)) {
                         return enabledFunction.call({}, args, FeatureManager.getContext());
@@ -207,7 +213,7 @@ export class FeatureManager {
                         return FeatureManager.normalizeValue(defaultValue);
                 }
         }
-        public static ifDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object) => any | any) = undefined): any {
+        public static ifDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[] = null, defaultValue: ((context: Object) => any | any) = undefined): any {
                 let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
                 if (!FeatureManager.isEnabled(featureDescriptor)) {
                         return fn.call({}, args, FeatureManager.getContext());
@@ -226,9 +232,7 @@ export class FeatureManager {
                 return new Feature(FeatureManager.getName(name), featureEnabled);
         }
 
-
-        
-        private static normalizeFeatureish(featureish: any): Feature {
+        private static normalizeFeatureish(featureish: Feature | FeatureDescriptor | any): Feature {
                 if (FeatureManager.isFeature(featureish)) {
                         return featureish;
                 } else if (FeatureManager.isFeatureDescriptor(featureish)) {
@@ -336,8 +340,10 @@ export class FeatureDescriptor {
 
         constructor(private feature: Feature, public enabled: boolean = undefined, public value: any = undefined, public toggleCount: number=0) {
                 this.name = feature.getName();
-                if (undefined === enabled) {
-                        enabled = !!feature.isEnabled();
+                if (undefined === enabled || null === enabled) {
+                        this.enabled = feature.isEnabled();
+                } else {
+                        this.enabled = enabled;
                 }
         }
 
