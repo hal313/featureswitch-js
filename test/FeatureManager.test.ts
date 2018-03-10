@@ -2,25 +2,12 @@ import { assert } from 'chai';
 import { FeatureManager, Feature, FeatureDescriptor } from '../src/index';
 import * as _ from 'lodash';
 
-// FeatureManager.setContext({
-//   getFeatureDescriptor: (featureDescriptor: FeatureDescriptor, context: any) => {
-//     console.log("featureDescriptor", featureDescriptor, 'context', context);
-//     //return featureDescriptor;
-//     return new FeatureDescriptor(new Feature('test', false), false, "", 0);
-//   }
-// });
-
-// FeatureManager.getAllFeatures().forEach((feature: Feature) => {
-//   console.log(`feature ${feature.getName()}: ${feature.isEnabled()}`);
-// });
-
 describe('FeatureManager', () => {
-
 
   // Required to start from a clean slate
   afterEach(() => {
     FeatureManager.removeAllFeatures();
-    FeatureManager.setContext({});
+    FeatureManager.setContext(null);
   });
 
 
@@ -248,22 +235,6 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should add multiple features correctly', () => {
-        let feature1 = new Feature('feature1', true);
-        let feature2 = new Feature('feature2', false);
-
-        FeatureManager.addFeature(feature1);
-        FeatureManager.addFeature(feature2);
-
-        assert.equal(FeatureManager.getAllFeatures().length, 2);
-
-        assert.equal(FeatureManager.getFeature(feature1).getName(), feature1.getName());
-        assert.equal(FeatureManager.getFeature(feature1).isEnabled(), feature1.isEnabled());
-
-        assert.equal(FeatureManager.getFeature(feature2).getName(), feature2.getName());
-        assert.equal(FeatureManager.getFeature(feature2).isEnabled(), feature2.isEnabled());
-      });
-
       it('should add a feature by Feature', () => {
         // Base assumption
         assert.equal(FeatureManager.getFeature(this.featureName), null);
@@ -362,370 +333,370 @@ describe('FeatureManager', () => {
         
     });
 
-      describe('removeFeature()', () => {
-
-          beforeEach(() => {
-              this.featureName = 'someFeatureName';
-              this.featureEnabled = true;
-          });
-
-          it('should remove feature by string', () => {
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(this.featureName), null);
-
-              FeatureManager.addFeature(new Feature(this.featureName, this.featureEnabled));
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(this.featureName).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(this.featureName).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(this.featureName);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(this.featureName), null);
-          });
-
-          it('should remove feature by Feature (same reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(feature);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by Feature (different reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let newFeature = new Feature(feature.getName(), feature.isEnabled());
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(newFeature);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by FeatureDescriptor (same reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let featureDescriptor = new FeatureDescriptor(feature);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(featureDescriptor);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(featureDescriptor);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by FeatureDescriptor (new reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let newFeature = new Feature(feature.getName(), feature.isEnabled());
-              let featureDescriptor = new FeatureDescriptor(feature);
-              let newFeatureDescriptor = new FeatureDescriptor(newFeature);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(featureDescriptor);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(newFeatureDescriptor);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by () => string)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(() => feature.getName());
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by () => Feature)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(() => feature);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by () => FeatureDescriptor)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeature(() => new FeatureDescriptor(feature));
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
+    describe('removeFeature()', () => {
+      
+      beforeEach(() => {
+        this.featureName = 'someFeatureName';
+        this.featureEnabled = true;
       });
 
-      describe('removeFeatures()', () => {
+      it('should remove feature by string', () => {
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(this.featureName), null);
+      
+        FeatureManager.addFeature(new Feature(this.featureName, this.featureEnabled));
 
-          beforeEach(() => {
-              this.featureName = 'someFeatureName';
-              this.featureEnabled = true;
-          });
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(this.featureName).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(this.featureName).isEnabled(), this.featureEnabled);
 
-          it('should remove features by string', () => {
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(this.featureName), null);
+        // Remove the feature
+        FeatureManager.removeFeature(this.featureName);
 
-              FeatureManager.addFeature(new Feature(this.featureName, this.featureEnabled));
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(this.featureName).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(this.featureName).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures([this.featureName]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(this.featureName), null);
-          });
-
-          it('should remove features by Feature (same reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures([feature]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove features by Feature (different reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let newFeature = new Feature(feature.getName(), feature.isEnabled());
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures([newFeature]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove features by FeatureDescriptor (same reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let featureDescriptor = new FeatureDescriptor(feature);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(featureDescriptor);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures([featureDescriptor]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove features by FeatureDescriptor (new reference)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-              let newFeature = new Feature(feature.getName(), feature.isEnabled());
-              let featureDescriptor = new FeatureDescriptor(feature);
-              let newFeatureDescriptor = new FeatureDescriptor(newFeature);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(featureDescriptor);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures([newFeatureDescriptor]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove features by () => string)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures(() => [feature.getName()]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove features by () => Feature)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures(() => [feature]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
-          it('should remove feature by () => FeatureDescriptor)', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
-
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-
-              // Add the feature
-              FeatureManager.addFeature(feature);
-
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
-
-              // Remove the feature
-              FeatureManager.removeFeatures(() => [new FeatureDescriptor(feature)]);
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
-          });
-
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(this.featureName), null);
       });
 
-      describe('removeAllFeatures', () => {
+      it('should remove feature by Feature (same reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
 
-          it('should remove all features', () => {
-              let feature = new Feature(this.featureName, this.featureEnabled);
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
 
-              // Base assumption
-              assert.equal(FeatureManager.getFeature(feature.getName()), null);
+        // Add the feature
+        FeatureManager.addFeature(feature);
 
-              // Add the feature
-              FeatureManager.addFeature(feature);
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
 
-              // Check for equality
-              assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
-              assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+        // Remove the feature
+        FeatureManager.removeFeature(feature);
 
-              FeatureManager.removeAllFeatures();
-
-              // Check that the feature has been removed
-              assert.equal(FeatureManager.getAllFeatures().length, 0);
-          });
-
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
       });
+
+      it('should remove feature by Feature (different reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let newFeature = new Feature(feature.getName(), feature.isEnabled());
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(newFeature);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove feature by FeatureDescriptor (same reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let featureDescriptor = new FeatureDescriptor(feature);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(featureDescriptor);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(featureDescriptor);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove feature by FeatureDescriptor (new reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let newFeature = new Feature(feature.getName(), feature.isEnabled());
+        let featureDescriptor = new FeatureDescriptor(feature);
+        let newFeatureDescriptor = new FeatureDescriptor(newFeature);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(featureDescriptor);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(newFeatureDescriptor);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+      
+      it('should remove feature by () => string)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(() => feature.getName());
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove feature by () => Feature)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(() => feature);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);        
+      });
+
+      it('should remove feature by () => FeatureDescriptor)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeature(() => new FeatureDescriptor(feature));
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+    });
+
+    describe('removeFeatures()', () => {
+      
+      beforeEach(() => {
+        this.featureName = 'someFeatureName';
+        this.featureEnabled = true;
+      });
+
+      it('should remove features by string', () => {
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(this.featureName), null);
+      
+        FeatureManager.addFeature(new Feature(this.featureName, this.featureEnabled));
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(this.featureName).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(this.featureName).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures([this.featureName]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(this.featureName), null);
+      });
+
+      it('should remove features by Feature (same reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures([feature]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove features by Feature (different reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let newFeature = new Feature(feature.getName(), feature.isEnabled());
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures([newFeature]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove features by FeatureDescriptor (same reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let featureDescriptor = new FeatureDescriptor(feature);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(featureDescriptor);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures([featureDescriptor]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove features by FeatureDescriptor (new reference)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+        let newFeature = new Feature(feature.getName(), feature.isEnabled());
+        let featureDescriptor = new FeatureDescriptor(feature);
+        let newFeatureDescriptor = new FeatureDescriptor(newFeature);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(featureDescriptor);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures([newFeatureDescriptor]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+      
+      it('should remove features by () => string)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures(() => [feature.getName()]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+      it('should remove features by () => Feature)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures(() => [feature]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);        
+      });
+
+      it('should remove feature by () => FeatureDescriptor)', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        // Remove the feature
+        FeatureManager.removeFeatures(() => [new FeatureDescriptor(feature)]);
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+      });
+
+    });
+
+    describe('removeAllFeatures()', () => {
+
+      it('should remove all features', () => {
+        let feature = new Feature(this.featureName, this.featureEnabled);
+
+        // Base assumption
+        assert.equal(FeatureManager.getFeature(feature.getName()), null);
+
+        // Add the feature
+        FeatureManager.addFeature(feature);
+
+        // Check for equality
+        assert.equal(FeatureManager.getFeature(feature.getName()).getName(), this.featureName);
+        assert.equal(FeatureManager.getFeature(feature.getName()).isEnabled(), this.featureEnabled);
+
+        FeatureManager.removeAllFeatures();
+
+        // Check that the feature has been removed
+        assert.equal(FeatureManager.getAllFeatures().length, 0);
+      });
+
+    });
 
     describe('hasFeature()', () => {
 
@@ -746,7 +717,7 @@ describe('FeatureManager', () => {
     });
 
     describe('hasValue()', () => {
-      
+
       beforeEach(() => {
         this.featureName = 'someFeatureName';
         this.featureEnabled = true;
@@ -890,7 +861,7 @@ describe('FeatureManager', () => {
         this.enabledFeature = new Feature(this.enabledFeatureName, true);
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
-      
+
       it('should throw an error when an unknown feature is requested', () => {
         assert.throw(() => FeatureManager.enable(this.enabledFeatureName));
       });
@@ -923,7 +894,7 @@ describe('FeatureManager', () => {
         FeatureManager.enable(this.enabledFeature);
 
         // Assert that the feature is enabled
-        assert.isTrue(FeatureManager.getFeature(this.enabledFeature).isEnabled());        
+        assert.isTrue(FeatureManager.getFeature(this.enabledFeature).isEnabled());
         assert.isTrue(FeatureManager.isEnabled(this.enabledFeature));
       });
 
@@ -945,7 +916,7 @@ describe('FeatureManager', () => {
         this.enabledFeature = new Feature(this.enabledFeatureName, true);
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
-      
+
       it('should throw an error when an unknown feature is requested', () => {
         assert.throw(() => FeatureManager.enable(this.enabledFeatureName));
       });
@@ -978,7 +949,7 @@ describe('FeatureManager', () => {
         FeatureManager.disable(this.enabledFeature);
 
         // Assert that the feature is enabled
-        assert.isFalse(FeatureManager.getFeature(this.enabledFeature).isEnabled());        
+        assert.isFalse(FeatureManager.getFeature(this.enabledFeature).isEnabled());
         assert.isFalse(FeatureManager.isEnabled(this.enabledFeature));
       });
 
@@ -992,14 +963,14 @@ describe('FeatureManager', () => {
     });
 
     describe('canSetEnabled()', () => {
-      
+
       beforeEach(() => {
         this.enabledFeatureName = 'enabledFeature';
         this.disabledFeatureName = 'disabledFeature';
         this.enabledFeature = new Feature(this.enabledFeatureName, true);
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
-      
+
       it('should throw an error when an unknown feature is requested', () => {
         assert.throw(() => FeatureManager.canSetEnabled(this.enabledFeatureName));
       });
@@ -1035,11 +1006,11 @@ describe('FeatureManager', () => {
         // Assertion
         assert.isTrue(FeatureManager.canSetEnabled(this.disabledFeature));
       });
-      
+
     });
 
     describe('setEnabled()', () => {
-      
+
       beforeEach(() => {
         this.enabledFeatureName = 'enabledFeature';
         this.disabledFeatureName = 'disabledFeature';
@@ -1059,7 +1030,7 @@ describe('FeatureManager', () => {
       it('should set enabled when requested to set enabled a feature which can be set', () => {
         // Add the feature
         FeatureManager.addFeature(this.enabledFeature, undefined, 1);
-        
+
         // Check that the feature is enabled
         assert.isTrue(FeatureManager.isEnabled(this.enabledFeature));
 
@@ -1074,7 +1045,7 @@ describe('FeatureManager', () => {
         let toggleCount = 5;
         // Add the feature
         FeatureManager.addFeature(this.enabledFeature, undefined, toggleCount);
-        
+
         // Check that the feature is enabled
         assert.isTrue(FeatureManager.isEnabled(this.enabledFeature));
 
@@ -1084,13 +1055,13 @@ describe('FeatureManager', () => {
         }
 
         // The next set should fail
-        assert.throw(() => FeatureManager.setEnabled(this.enabledFeature, !FeatureManager.isEnabled(this.enabledFeature)));       
+        assert.throw(() => FeatureManager.setEnabled(this.enabledFeature, !FeatureManager.isEnabled(this.enabledFeature)));
       });
 
     });
 
     describe('getValue()', () => {
-      
+
       beforeEach(() => {
         this.featureName = 'someFeatureName';
         this.featureEnabled = true;
@@ -1197,7 +1168,7 @@ describe('FeatureManager', () => {
         });
 
       });
-        
+
     });
 
     describe('createFeature()', () => {
@@ -1292,6 +1263,314 @@ describe('FeatureManager', () => {
       });
 
     });
+
+      describe('Context', () => {
+
+          describe('setContext()', () => {
+
+              it('should set the context', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Assert that the two contexts are strictly equal
+                  assert.deepEqual(FeatureManager.getContext(), context);
+              });
+
+              it('should use the set context during addSource()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.addSource(this.sourceName, (passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [new Feature(this.featureName, this.featureDescriptor)];
+                  });
+
+              });
+
+              it('should use the set context during setFeatures()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.setFeatures((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [new Feature(this.featureName, this.featureDescriptor)];
+                  });
+
+              });
+
+              it('should use the set context during addFeature()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.addFeature((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return new Feature(this.featureName, this.featureDescriptor);
+                  });
+
+              });
+
+              it('should use the set context during addFeatures()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.addFeatures((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [new Feature(this.featureName, this.featureDescriptor)];
+                  });
+
+              });
+
+              it('should use the set context during removeFeature()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.removeFeature((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return this.featureName;
+                  });
+
+              });
+
+              it('should use the set context during removeFeatures()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.removeFeatures((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [this.featureName];
+                  });
+
+              });
+
+              it('should use the set context during removeFeatures()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.removeFeatures((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [this.featureName];
+                  });
+
+              });
+
+              it('should use the set context during getFeature()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.getFeature((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return this.featureName;
+                  });
+
+              });
+
+              it('should use the set context during getFeatures()', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  FeatureManager.getFeatures((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [this.featureName];
+                  });
+
+              });
+
+              it('should use the set context during setValue()', () => {
+                  let context = {someValue: true};
+                  let feature = new Feature(this.featureName, this.featureEnabled);
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Add the feature
+                  FeatureManager.addFeature(feature);
+
+                  FeatureManager.setValue(feature, (passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return [feature.getName()];
+                  });
+
+              });
+
+              it('should use the set context during isEnabled()', () => {
+                  let context = {someValue: true};
+                  let feature = new Feature(this.featureName, this.featureEnabled);
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Add the feature
+                  FeatureManager.addFeature(feature);
+
+                  FeatureManager.isEnabled(feature, (passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                  });
+
+              });
+
+              it('should use the set context during canEnable()', () => {
+                  let context = {someValue: true};
+                  let feature = new Feature(this.featureName, this.featureEnabled);
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Add the feature
+                  FeatureManager.addFeature(feature);
+
+                  FeatureManager.canEnable((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return feature;
+                  });
+
+              });
+
+              it('should use the set context during canDisable()', () => {
+                  let context = {someValue: true};
+                  let feature = new Feature(this.featureName, this.featureEnabled);
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Add the feature
+                  FeatureManager.addFeature(feature);
+
+                  FeatureManager.canDisable((passedContext: any) => {
+                      assert.deepEqual(passedContext, context);
+                      return feature;
+                  });
+
+              });
+
+              // TODO: Test canSetEnabled
+              // TODO: Test setEnabled
+              // TODO: Test ifEnabled
+              // TODO: Test ifDisabled
+              // TODO: Test createFeature
+              it('should use the set context during enable()', () => {
+                  let context = {someValue: true};
+                  let feature = new Feature(this.featureName, this.featureEnabled);
+
+                  // Check the initial context
+                  // assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  // FeatureManager.setContext(context);
+
+                  // Add the feature
+                  //FeatureManager.addFeature(new FeatureDescriptor(feature, feature.isEnabled(), null, -1));
+                  FeatureManager.addFeature(feature);
+
+                  // FeatureManager.enable((passedContext: any) => {
+                  //   assert.deepEqual(passedContext, context);
+                  //   return feature;
+                  // });
+
+              });
+
+              // it('should use the set context during disable()', () => {
+              //   let context = {someValue: true};
+              //   let feature = new Feature(this.featureName, this.featureEnabled);
+
+              //   // Check the initial context
+              //   assert.deepEqual(FeatureManager.getContext(), {});
+
+              //   // Set the context
+              //   FeatureManager.setContext(context);
+
+              //   // Add the feature
+              //   FeatureManager.addFeature(feature);
+
+              //   FeatureManager.disable((passedContext: any) => {
+              //     assert.deepEqual(passedContext, context);
+              //     return feature;
+              //   });
+
+              // });
+
+
+          });
+
+          describe('getContext()', () => {
+
+              it('should get the context which was set', () => {
+                  let context = {someValue: true};
+
+                  // Check the initial context
+                  assert.deepEqual(FeatureManager.getContext(), {});
+
+                  // Set the context
+                  FeatureManager.setContext(context);
+
+                  // Assert that the two contexts are strictly equal
+                  assert.deepEqual(FeatureManager.getContext(), context);
+              });
+
+          });
+
+      });
 
   });
 
