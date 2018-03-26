@@ -4,6 +4,7 @@ node_js:
   - '5'
   - '4'
 script:
-  - npm install -g ts-node typescript mocha
+  - npm install
+  ## - npm install -g typescript
   - npm run test
   - npm run bundle
