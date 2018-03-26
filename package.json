@@ -8,7 +8,21 @@
     "start": "karma start",
     "bundle": "webpack",
     "prepublish": "rimraf ./lib && tsc -d",
-    "test": "mocha test/**.ts --require ts-node/register"
+    "test": "mocha test/**.ts --require ts-node/register",
+    "test:watch": "mocha test/**.ts --require ts-node/register --reporter min --watch --watch-extensions ts",
+    "coverage": "nyc mocha test/**.ts --require ts-node/register --require source-map-support/register"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "lib/**/*"
+    ],
+    "reporter": "html",
+    "all": true
   },
   "repository": {
     "type": "git",
@@ -41,7 +55,8 @@
     "lodash": "^4.17.5",
     "mocha": "^5.0.4",
     "rimraf": "^2.5.2",
-    "ts-node": "^2.1.0",
+    "source-map-support": "^0.5.4",
+    "ts-node": "^5.0",
     "typescript": "^2.1.0",
     "webpack": "^2.2.0",
     "webpack-dev-server": "^2.2.0"
