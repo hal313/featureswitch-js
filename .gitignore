@@ -4,3 +4,4 @@ dist/
 .idea/
 lib/
 .nyc_output/
+coverage/
