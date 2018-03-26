@@ -1,18 +1,11 @@
 // CODE QUALITY
-// TODO: Use defaultValue, context in getValue()
-// TODO: Use context in isEnabled()
-// TODO: Use context in canSetEnabled()
 // TODO: Check parameters (include descriptors and function returns)
-// TODO: Check that all functions take in Feature|FeatureDescriptor|any|()=>Feature|FeatureDescriptor|any as appropriate
+// TODO: Check that all functions take in Feature|FeatureDescriptor|()=>Feature|FeatureDescriptor as appropriate
 // TODO: Order if/else/else if
 // TODO: Check TODO's
-// TODO: this => FeatureManager
 // TODO: Use getName(string|Feature|FeatureDescriptor|()=>string|Feature|FeatureDescriptor)
-// TODO: Use "object" instead of "Object" [https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html]
 
 // FILE
-// TODO: Add private static clearFeatures(): void {FeatureManager.FEATURES = {};}
-// TODO: Get rid of static? Use default instance for static? Support named instances?
 // TODO: Union types for identifiers?
 // TODO: Identifier functions should be able to return featurish objects
 // TODO: addSource() should take any[], Feature[] or FeatureDescriptor[]
@@ -38,12 +31,12 @@
 
 export class FeatureManager {
 
-        private static FEATURES:any  = {};
-        private static CONTEXT = {};
+        private FEATURES:any  = {};
+        private CONTEXT = {};
 
-        public static addSource(name: string, source: (context: Object) => Feature[] | FeatureDescriptor[]) {
-                let results = source(FeatureManager.getContext());
-                FeatureManager.addFeatures(results);
+        public addSource(name: string, source: (context: Object) => Feature[] | FeatureDescriptor[]) {
+                let results = source(this.getContext());
+                this.addFeatures(results);
         }
 
         /**
@@ -52,151 +45,168 @@ export class FeatureManager {
          * 
          * @param features the features to add
          */
-        public static setFeatures(features: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[] )): void {
+        public setFeatures(features: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[] )): void {
                 if (FeatureManager.isFunction(features)) {
-                        return FeatureManager.setFeatures(features(FeatureManager.getContext()));
+                        return this.setFeatures(features(this.getContext()));
                 } else {
-                        FeatureManager.removeAllFeatures();
-                        FeatureManager.addFeatures(features);
+                        this.removeAllFeatures();
+                        this.addFeatures(features);
                 }
         }
-        public static addFeatures(featureIdentifiers: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[])): void {
+        public addFeatures(featureIdentifiers: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[])): void {
                 if (FeatureManager.isFunction(featureIdentifiers)) {
-                        return FeatureManager.addFeatures(featureIdentifiers(FeatureManager.getContext()));
+                        return this.addFeatures(featureIdentifiers(this.getContext()));
                 } else {
                         if (FeatureManager.isFeatureArray(featureIdentifiers) || FeatureManager.isFeatureDescriptorArray(featureIdentifiers)) {
-                                featureIdentifiers.forEach((featureIdentifier: Feature | FeatureDescriptor) => FeatureManager.addFeature(featureIdentifier));
+                                featureIdentifiers.forEach((featureIdentifier: Feature | FeatureDescriptor) => this.addFeature(featureIdentifier));
                         } else {
                                 throw new Error(`Unknown feature identifer type '${typeof featureIdentifiers}'`);
                         }                        
                 }
         }
-        public static addFeature(feature: Feature | FeatureDescriptor | any | ((context: Object) => Feature | FeatureDescriptor), value: any=undefined, toggleCount: number=0): void {
+        public addFeature(feature: Feature | FeatureDescriptor | any | ((context: Object) => Feature | FeatureDescriptor), value: any=undefined, toggleCount: number=0): void {
                 if (FeatureManager.isFunction(feature)) {
-                        return FeatureManager.addFeature(feature(FeatureManager.getContext()));
+                        return this.addFeature(feature(this.getContext()));
                 } else {
-                        let normalizedFeature = FeatureManager.normalizeFeatureish(feature);
-                        FeatureManager.FEATURES[normalizedFeature.getName()] = new FeatureDescriptor(normalizedFeature, normalizedFeature.isEnabled(), value, toggleCount);
+                        let normalizedFeature = this.normalizeFeatureish(feature);
+                        this.FEATURES[normalizedFeature.getName()] = new FeatureDescriptor(normalizedFeature, normalizedFeature.isEnabled(), value, toggleCount);
                 }
         }
 
-        public static removeFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): void {
+        public removeFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): void {
                 if (FeatureManager.isFunction(featureIdentifiers)) {
-                        FeatureManager.removeFeatures(featureIdentifiers(FeatureManager.getContext()));
+                        this.removeFeatures(featureIdentifiers(this.getContext()));
                 } else if (FeatureManager.isStringArray(featureIdentifiers)) {
-                        featureIdentifiers.forEach(FeatureManager.removeFeature);
+                        featureIdentifiers.forEach(this.removeFeature.bind(this));
                 } else if (FeatureManager.isFeatureArray(featureIdentifiers) || FeatureManager.isFeatureDescriptorArray(featureIdentifiers)) {
-                        featureIdentifiers.forEach(FeatureManager.removeFeature);
+                        featureIdentifiers.forEach(this.removeFeature.bind(this));
                 } else {
                         throw new Error(`Unknown feature identifier type '${typeof featureIdentifiers}'`);
                 }
         }
-        public static removeFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
+        public removeFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
                 if (FeatureManager.isFunction(featureIdentifier)) {
-                        FeatureManager.removeFeature(featureIdentifier(FeatureManager.getContext()));
+                        this.removeFeature(featureIdentifier(this.getContext()));
                 } else {
-                        delete FeatureManager.FEATURES[FeatureManager.getName(featureIdentifier)];
+                        let name = this.getName(featureIdentifier);
+                        if (!!name) {
+                                delete this.FEATURES[this.getName(featureIdentifier)];
+                        }
                 }
         }
-        public static removeAllFeatures(): void {
+        public removeAllFeatures(): void {
                 // .forEach is not avaialble without a polyfill
-                // FeatureManager.FEATURES.forEach(FeatureManager.removeFeature);
+                // this.FEATURES.forEach(this.removeFeature);
 
-                FeatureManager.getAllFeatures().forEach(FeatureManager.removeFeature);
+                this.getAllFeatures().forEach(this.removeFeature.bind(this));
         }
 
-        public static setContext(context: Object): void {
+        public setContext(context: Object): void {
                 // Do not clone (we will not get functions if we clone)
-                // FeatureManager.CONTEXT = FeatureManager.clone(context);
-                FeatureManager.CONTEXT = context || {};
+                // this.CONTEXT = FeatureManager.clone(context);
+                Object.getOwnPropertyNames(context).forEach((name: string) => {
+                        if (FeatureManager.isFunction((<any>context)[name])) {
+                                throw new Error(`Context cannot contain a function ('${name}'`);
+                        }
+                });
+
+                this.CONTEXT = FeatureManager.clone(context);
         }
-        public static getContext(): Object {
+        public getContext(): Object {
                 // Do not clone (we will not get functions if we clone)
-                // return FeatureManager.clone(FeatureManager.CONTEXT);
-                return FeatureManager.CONTEXT;
+                // return FeatureManager.clone(this.CONTEXT);
+                return FeatureManager.clone(this.CONTEXT);
         }
         
-        public static getAllFeatures(): Feature[] {
+        public getAllFeatures(): Feature[] {
                 // .map is not available without a polyfil
-                // return FeatureManager.FEATURES.map((featureDescriptor: FeatureDescriptor) => {
+                // return this.FEATURES.map((featureDescriptor: FeatureDescriptor) => {
                 //         // Invoke FeatureManager.getFeature for consistency
-                //         return FeatureManager.getFeature(featureDescriptor.name);
+                //         return this.getFeature(featureDescriptor.name);
                 // });
                 
                 let features: Feature[] = [];
-                Object.getOwnPropertyNames(FeatureManager.FEATURES).forEach((name: string) => {
-                        features.push(FeatureManager.getFeature(name));
+                Object.getOwnPropertyNames(this.FEATURES).forEach((name: string) => {
+                        features.push(this.getFeature(name));
                 });
                 return features;
         }
-        public static getFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): Feature {
+        public getFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): Feature {
                 if (FeatureManager.isFunction(featureIdentifier)) {
-                        return FeatureManager.getFeature(featureIdentifier(FeatureManager.getContext()));
+                        return this.getFeature(featureIdentifier(this.getContext()));
                 } else {
-                        let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
+                        let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
                         return !!featureDescriptor ? featureDescriptor.getFeature() : null;
                 }
         }
-        public static getFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): Feature[] {
+        public getFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): Feature[] {
                 let features: Feature[] = [];
+
+                let pushIfNotEmpty = function(feature: Feature) {
+                        if (!!feature) {
+                                features.push(feature);
+                        }
+                }
 
                 if (FeatureManager.isStringArray(featureIdentifiers)) {
                         featureIdentifiers.forEach((featureName: string) => {
-                                features.push(FeatureManager.getFeature(featureName));
+                                pushIfNotEmpty(this.getFeature(featureName));
                         });
                 } else if (FeatureManager.isFeatureArray(featureIdentifiers) || FeatureManager.isFeatureDescriptorArray(featureIdentifiers)) {
                         featureIdentifiers.forEach((feature: Feature) => {
-                                features.push(FeatureManager.getFeature(feature));
+                                pushIfNotEmpty(this.getFeature(feature));
                         });
                 } else if (FeatureManager.isFunction(featureIdentifiers)) {
-                        return FeatureManager.getFeatures(featureIdentifiers(FeatureManager.getContext()));
+                        return this.getFeatures(featureIdentifiers(this.getContext()));
                 } else {
                         throw new Error(`Unknown feature identifiers type '${typeof featureIdentifiers}'`);
                 }
 
                 return features;
         }
-        public static hasFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
-                return !!FeatureManager.getFeatureDescriptor(featureIdentifier);
+        public hasFeature(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                return !!this.getFeatureDescriptor(featureIdentifier);
         }
-        public static hasValue(featureIdentifier: string | Feature | FeatureDescriptor, context: Object = undefined): boolean {
-                return undefined !== FeatureManager.getValue(FeatureManager.getFeature(featureIdentifier).getName(), null, context);
+        public hasValue(featureIdentifier: string | Feature | FeatureDescriptor, context: Object = undefined): boolean {
+                return undefined !== this.getValue(this.getFeature(featureIdentifier).getName(), null, context);
         }
-        public static getValue(featureIdentifier: string | Feature | FeatureDescriptor, defaultValue: any = undefined, context: Object=undefined): Object {
-                return FeatureManager.getFeatureDescriptor(featureIdentifier).value;
+        public getValue(featureIdentifier: string | Feature | FeatureDescriptor, defaultValue: any = undefined, context: Object=undefined): Object {
+                return this.getFeatureDescriptor(featureIdentifier).value;
         }
-        public static setValue(featureIdentifier: string | Feature | FeatureDescriptor, value: any | ((context: Object) => any)): void {
-                FeatureManager.getFeatureDescriptor(featureIdentifier).value = FeatureManager.normalizeValue(value);
+        public setValue(featureIdentifier: string | Feature | FeatureDescriptor, value: any | ((context: Object) => any)): void {
+                this.getFeatureDescriptor(featureIdentifier).value = this.normalizeValue(value);
         }
 
-        public static isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
-                return FeatureManager.getFeatureDescriptor(featureIdentifier).enabled;
+        public isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
+                return undefined !== this.getFeatureDescriptor(featureIdentifier).enabled ? !!this.getFeatureDescriptor(featureIdentifier).enabled : false;
         }
-        public static isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
-                return !FeatureManager.isEnabled(featureIdentifier, context);
+
+        public isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
+                return !this.isEnabled(featureIdentifier, context);
         }
-        public static canEnable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
-                return FeatureManager.canSetEnabled(featureIdentifier);
+
+        public canEnable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                return this.canSetEnabled(featureIdentifier);
         }
-        public static canDisable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
-                return FeatureManager.canSetEnabled(featureIdentifier);
+        public canDisable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                return this.canSetEnabled(featureIdentifier);
         }
-        public static enable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
-                return FeatureManager.setEnabled(featureIdentifier, true);
+        public enable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
+                return this.setEnabled(featureIdentifier, true);
         }
-        public static disable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
-                return FeatureManager.setEnabled(featureIdentifier, false);
+        public disable(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): void {
+                return this.setEnabled(featureIdentifier, false);
         }
-        public static canSetEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
-                let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
+        public canSetEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), context: Object=undefined): boolean {
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
                 return undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
         }
-        public static setEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean) {
-                let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
+        public setEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean) {
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
                 let feature = featureDescriptor.getFeature();
                 
-                if (FeatureManager.canSetEnabled(feature)) {
-                        featureDescriptor.enabled = enabled;
+                if (this.canSetEnabled(feature)) {
+                        featureDescriptor.enabled = !!enabled;
                         if (featureDescriptor.toggleCount > 0) {
                                 featureDescriptor.toggleCount--;
                         }
@@ -205,65 +215,65 @@ export class FeatureManager {
                 } 
         }
 
-        public static ifEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabledFunction: ((args: any[], context: Object) => any), args: any[] = null, defaultValue: any | ((context: Object)=>any)=undefined): any {
-                let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
-                if (FeatureManager.isEnabled(featureDescriptor)) {
-                        return enabledFunction.call({}, args, FeatureManager.getContext());
+        public ifEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabledFunction: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object)=>any | any)=undefined): any {
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
+                if (this.isEnabled(featureDescriptor)) {
+                        return enabledFunction.call({}, args, this.getContext());
                 } else {
-                        return FeatureManager.normalizeValue(defaultValue);
+                        return this.normalizeValue(defaultValue);
                 }
         }
-        public static ifDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[] = null, defaultValue: ((context: Object) => any | any) = undefined): any {
-                let featureDescriptor = FeatureManager.getFeatureDescriptor(featureIdentifier);
-                if (!FeatureManager.isEnabled(featureDescriptor)) {
-                        return fn.call({}, args, FeatureManager.getContext());
+        public ifDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), fn: ((args: any[], context: Object) => any), args: any[], defaultValue: ((context: Object) => any | any) = undefined): any {
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
+                if (!this.isEnabled(featureDescriptor)) {
+                        return fn.call({}, args, this.getContext());
                 } else {
-                        return FeatureManager.normalizeValue(defaultValue);
+                        return this.normalizeValue(defaultValue);
                 }
         }
 
-        public static createFeature(name: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean | ((context: Object) => boolean)): Feature {
-                let featureEnabled = !!FeatureManager.normalizeValue(enabled);
+        public createFeature(name: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean | ((context: Object) => boolean)): Feature {
+                let featureEnabled = !!this.normalizeValue(enabled);
                 
                 if (FeatureManager.isFunction(name)) {
-                        return FeatureManager.createFeature(name(FeatureManager.getContext()), enabled);
+                        return this.createFeature(name(this.getContext()), enabled);
                 }
 
-                return new Feature(FeatureManager.getName(name), featureEnabled);
+                return new Feature(this.getName(name), featureEnabled);
         }
 
-        private static normalizeFeatureish(featureish: Feature | FeatureDescriptor | any): Feature {
+        private normalizeFeatureish(featureish: Feature | FeatureDescriptor | any): Feature {
                 if (FeatureManager.isFeature(featureish)) {
                         return featureish;
                 } else if (FeatureManager.isFeatureDescriptor(featureish)) {
                         return featureish.getFeature();
                 } else if (FeatureManager.isFeatureish(featureish)) {
-                        return FeatureManager.createFeature(featureish.name, featureish.enabled);
+                        return this.createFeature(featureish.name, featureish.enabled);
                 } else {
                         throw new Error(`Not able to normalize to a feature '${featureish}'`);
                 }
         }
-        private static normalizeValue(value: ((context: Object) => Object) | any) {
-                return FeatureManager.isFunction(value) ? value(FeatureManager.getContext()) : value;
+        private normalizeValue(value: ((context: Object) => Object) | any) {
+                return FeatureManager.isFunction(value) ? value(this.getContext()) : value;
         }
 
-        private static getFeatureDescriptor(featureDescriptorIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): FeatureDescriptor {
+        private getFeatureDescriptor(featureDescriptorIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): FeatureDescriptor {
                 if (FeatureManager.isFunction(featureDescriptorIdentifier)) {
-                        return FeatureManager.getFeatureDescriptor(featureDescriptorIdentifier(FeatureManager.getContext()));
+                        return this.getFeatureDescriptor(featureDescriptorIdentifier(this.getContext()));
                 } else {
-                        let featureDescriptor = FeatureManager.FEATURES[FeatureManager.getName(featureDescriptorIdentifier)];
-                        if (FeatureManager.isFunction((<any>FeatureManager.getContext()).getFeatureDescriptor)) {
+                        let featureDescriptor = this.FEATURES[this.getName(featureDescriptorIdentifier)];
+                        if (FeatureManager.isFunction((<any>this.getContext()).getFeatureDescriptor)) {
                                 // If the FeatureManager's context has a function called 'getFeatureDescriptor', then invoke that with a clone of the FeatureDescriptor
-                                return (<any>FeatureManager.getContext()).getFeatureDescriptor(FeatureManager.clone(featureDescriptor), FeatureManager.clone(FeatureManager.getContext()));
+                                return (<any>this.getContext()).getFeatureDescriptor(FeatureManager.clone(featureDescriptor), FeatureManager.clone(this.getContext()));
                         } else {
                                 return featureDescriptor;
                         }
                 }
         }
 
-        private static getName(nameIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): string {
+        private getName(nameIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): string {
                 if (FeatureManager.isFunction(nameIdentifier)) {
-                        return FeatureManager.getName(nameIdentifier(FeatureManager.getContext()));
+                        return this.getName(nameIdentifier(this.getContext()));
                 } else if (FeatureManager.isString(nameIdentifier)) {
                         return nameIdentifier;
                 } else if (FeatureManager.isFeature(nameIdentifier)) {
@@ -341,9 +351,9 @@ export class FeatureDescriptor {
         constructor(private feature: Feature, public enabled: boolean = undefined, public value: any = undefined, public toggleCount: number=0) {
                 this.name = feature.getName();
                 if (undefined === enabled || null === enabled) {
-                        this.enabled = feature.isEnabled();
+                        this.enabled = !!feature.isEnabled();
                 } else {
-                        this.enabled = enabled;
+                        this.enabled = !!enabled;
                 }
         }
 
