@@ -1,10 +1,12 @@
-sudo: false
 language: node_js
 node_js:
-  - '5'
-  - '4'
+  - '8.9.3'
+before_install:
+  - npm install -g typescript
 script:
   - npm install
-  ## - npm install -g typescript
   - npm run test
   - npm run bundle
+notifications:
+  email:
+    - john-github@rmdashrf.org
