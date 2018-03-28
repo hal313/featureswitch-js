@@ -358,7 +358,7 @@ export class FeatureDescriptor {
 
         public name: string;
 
-        constructor(private featureish: string | Featureish | Feature | FeatureDescriptor | any | (() => string | Feature | FeatureDescriptor | (() => string | Feature | FeatureDescriptor)), public enabled: boolean = undefined, public value: any = undefined, public toggleCount: number=undefined) {
+        constructor(private featureish: string | Feature | FeatureDescriptor | any | (() => string | Feature | FeatureDescriptor | (() => string | Feature | FeatureDescriptor)), public enabled: boolean = undefined, public value: any = undefined, public toggleCount: number=undefined) {
                 if (undefined === featureish || null === featureish) {
                         throw new Error(`No value passed in`);
                 }
