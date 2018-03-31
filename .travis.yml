@@ -6,7 +6,6 @@ before_install:
 script:
   - npm install
   - npm run test
-  - npm run bundle
 notifications:
   email:
     - john-github@rmdashrf.org
