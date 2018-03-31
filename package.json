@@ -1,6 +1,6 @@
 {
   "name": "featureswitch-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript library which implements feature switches",
   "main": "./dist/FeatureManager.js",
   "typings": "./lib/FeatureManager.d.ts",
@@ -12,7 +12,13 @@
   },
   "files": [
     "dist/FeatureManager.js",
-    "lib/FeatureManager.d.ts"
+    "lib/FeatureManager.d.ts",
+    "src/**/*",
+    "test/**/*.ts",
+    "karma.conf.js",
+    "package-lock.json",
+    "tsconfig.json",
+    "webpack.config.js"
   ],
   "nyc": {
     "extension": [
