@@ -2,15 +2,18 @@
   "name": "featureswitch-js",
   "version": "1.0.0",
   "description": "TypeScript library which implements feature switches",
-  "main": "./lib/index.js",
-  "typings": "./lib/index.d.ts",
+  "main": "./dist/FeatureManager.js",
+  "typings": "./lib/FeatureManager.d.ts",
   "scripts": {
-    "bundle": "webpack",
-    "prepublish": "rimraf ./lib && tsc -d",
+    "prepublish": "rimraf ./lib && rimraf ./dist && tsc -d && webpack",
     "test": "mocha test/**.ts --require ts-node/register",
     "test:watch": "mocha test/**.ts --require ts-node/register --reporter min --watch --watch-extensions ts",
     "coverage": "rimraf coverage && nyc mocha test/**.ts --require ts-node/register --require source-map-support/register"
   },
+  "files": [
+    "dist/FeatureManager.js",
+    "lib/FeatureManager.d.ts"
+  ],
   "nyc": {
     "extension": [
       ".ts"
