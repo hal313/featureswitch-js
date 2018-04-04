@@ -899,8 +899,12 @@ describe('FeatureManager', () => {
         this.featureValue = {someValueName: 'someValueValue'};
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.isEnabled(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.isEnabled(this.featureName));
+      });
+
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.isEnabled(this.featureName));
       });
 
       it('should return true when the feature is enabled', () => {
@@ -922,8 +926,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.isDisabled(this.featureName));
+      it('should return true when an unknown feature is requested', () => {
+        assert.isTrue(this.featureManager.isDisabled(this.featureName));
       });
 
       it('should return false when the feature is enabled', () => {
@@ -945,8 +949,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canEnable(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canEnable(this.featureName));
       });
 
       it('should return true if the feature can be enabled', () => {
@@ -973,8 +977,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canDisable(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canDisable(this.featureName));
       });
 
       it('should return true if the feature can be disabled', () => {
@@ -1004,7 +1008,7 @@ describe('FeatureManager', () => {
       });
 
       it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.enable(this.enabledFeatureName));
+        assert.throws(() => this.featureManager.enable(this.enabledFeatureName));
       });
 
       it('should enable a previously disabled feature', () => {
@@ -1044,7 +1048,7 @@ describe('FeatureManager', () => {
         this.featureManager.addFeature(new FeatureDescriptor(this.disabledFeature), null, 0);
 
         // Enable the feature
-        assert.throw(() => this.featureManager.enable(this.disabledFeature));
+        assert.throws(() => this.featureManager.enable(this.disabledFeature));
       });
 
     });
@@ -1059,7 +1063,7 @@ describe('FeatureManager', () => {
       });
 
       it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.enable(this.enabledFeatureName));
+        assert.throws(() => this.featureManager.enable(this.enabledFeatureName));
       });
 
       it('should disable a previously disabled feature', () => {
@@ -1099,7 +1103,7 @@ describe('FeatureManager', () => {
         this.featureManager.addFeature(new FeatureDescriptor(this.disabledFeature), null, 0);
 
         // Enable the feature
-        assert.throw(() => this.featureManager.disable(this.disabledFeature));
+        assert.throws(() => this.featureManager.disable(this.disabledFeature));
       });
     });
 
@@ -1112,8 +1116,8 @@ describe('FeatureManager', () => {
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canSetEnabled(this.enabledFeatureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canSetEnabled(this.enabledFeatureName));
       });
 
       it('should return false when an enabled feature cannot be set enabled', () => {
@@ -1160,12 +1164,12 @@ describe('FeatureManager', () => {
       });
 
       it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.setEnabled(this.enabledFeatureName, true));
+        assert.throws(() => this.featureManager.setEnabled(this.enabledFeatureName, true));
       });
 
       it('should throw when requested to set enabled a feature which cannot be set', () => {
         this.featureManager.addFeature(this.enabledFeature);
-        assert.throw(() => this.featureManager.setEnabled(this.enabledFeature, false));
+        assert.throws(() => this.featureManager.setEnabled(this.enabledFeature, false));
       });
 
       it('should set enabled when requested to set enabled a feature which can be set', () => {
@@ -1196,7 +1200,7 @@ describe('FeatureManager', () => {
         }
 
         // The next set should fail
-        assert.throw(() => this.featureManager.setEnabled(this.enabledFeature, !this.featureManager.isEnabled(this.enabledFeature)));
+        assert.throws(() => this.featureManager.setEnabled(this.enabledFeature, !this.featureManager.isEnabled(this.enabledFeature)));
       });
 
     });
@@ -1209,12 +1213,17 @@ describe('FeatureManager', () => {
         this.featureValue = {someValueName: 'someValueValue'};
       });
 
+      it('should return null when no feature has been set', () => {
+        // Check the value
+        assert.isNull(this.featureManager.getValue(this.featureName));
+      });
+
       it('should return undefined when no value has been set', () => {
         // Add a feature
         this.featureManager.addFeature(new FeatureDescriptor(new Feature(this.featureName), this.featureValue));
 
         // Check the value
-        assert.equal(this.featureManager.getValue(this.featureName), undefined);
+        assert.isUndefined(this.featureManager.getValue(this.featureName));
       });
 
       it('should return the assigned value', () => {

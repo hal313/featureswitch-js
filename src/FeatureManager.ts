@@ -143,14 +143,16 @@ export class FeatureManager {
                 return undefined !== value && null !== value;
         }
         public getValue(featureIdentifier: string | Feature | FeatureDescriptor, defaultValue: any = undefined, context: Object=undefined): Object {
-                return this.getFeatureDescriptor(featureIdentifier).value;
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
+                return undefined !== featureDescriptor ? featureDescriptor.value : null;
         }
         public setValue(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), value: any | ((context: Object) => any)): void {
                 this.getFeatureDescriptor(featureIdentifier).value = this.normalizeValue(value);
         }
 
         public isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
-                return undefined !== this.getFeatureDescriptor(featureIdentifier).enabled ? !!this.getFeatureDescriptor(featureIdentifier).enabled : false;
+                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
+                return undefined !== featureDescriptor ? !!featureDescriptor.enabled : false;
         }
         public isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
                 return !this.isEnabled(featureIdentifier);
@@ -170,7 +172,7 @@ export class FeatureManager {
         }
         public canSetEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
                 let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
-                return undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
+                return undefined === featureDescriptor ? false : undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
         }
         public setEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean) {
                 let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
