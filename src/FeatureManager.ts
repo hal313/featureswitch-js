@@ -70,10 +70,20 @@ export class FeatureManager {
 
         public addFeatures(featureIdentifiers: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[])): void {
                 (this.asFeatureArray(featureIdentifiers)).forEach((featureIdentifier: Feature | FeatureDescriptor) => this.addFeature(featureIdentifier));
+                // (this.asFeatureArray(featureIdentifiers)).forEach((featureIdentifier: Feature | FeatureDescriptor) => {
+                //         console.log('adding feature', featureIdentifier);
+                //         this.addFeature(featureIdentifier);
+                // });
         }
 
         public addFeature(featureIdentifier: Feature | FeatureDescriptor | any | ((context: Object) => Feature | FeatureDescriptor)): void {
                 let normalizedFeature = this.normalizeFeatureish(this.normalizeValue(featureIdentifier));
+
+                // Check that the feature does not exist
+                if (!!this.features[normalizedFeature.name]) {                        
+                        throw new Error(`Cannot add feature ('${normalizedFeature.name}') because it already exists`);
+                }
+
                 this.features[normalizedFeature.name] = normalizedFeature;
         }
 
@@ -143,16 +153,14 @@ export class FeatureManager {
                 return undefined !== value && null !== value;
         }
         public getValue(featureIdentifier: string | Feature | FeatureDescriptor, defaultValue: any = undefined, context: Object=undefined): Object {
-                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
-                return undefined !== featureDescriptor ? featureDescriptor.value : null;
+                return this.getFeatureDescriptor(featureIdentifier).value;
         }
         public setValue(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), value: any | ((context: Object) => any)): void {
                 this.getFeatureDescriptor(featureIdentifier).value = this.normalizeValue(value);
         }
 
         public isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
-                let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
-                return undefined !== featureDescriptor ? !!featureDescriptor.enabled : false;
+                return undefined !== this.getFeatureDescriptor(featureIdentifier).enabled ? !!this.getFeatureDescriptor(featureIdentifier).enabled : false;
         }
         public isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
                 return !this.isEnabled(featureIdentifier);
@@ -172,7 +180,7 @@ export class FeatureManager {
         }
         public canSetEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
                 let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
-                return undefined === featureDescriptor ? false : undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
+                return undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
         }
         public setEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor), enabled: boolean) {
                 let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
