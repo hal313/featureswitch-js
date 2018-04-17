@@ -70,10 +70,6 @@ export class FeatureManager {
 
         public addFeatures(featureIdentifiers: Feature[] | FeatureDescriptor[] | ((context: Object) => Feature[] | FeatureDescriptor[])): void {
                 (this.asFeatureArray(featureIdentifiers)).forEach((featureIdentifier: Feature | FeatureDescriptor) => this.addFeature(featureIdentifier));
-                // (this.asFeatureArray(featureIdentifiers)).forEach((featureIdentifier: Feature | FeatureDescriptor) => {
-                //         console.log('adding feature', featureIdentifier);
-                //         this.addFeature(featureIdentifier);
-                // });
         }
 
         public addFeature(featureIdentifier: Feature | FeatureDescriptor | any | ((context: Object) => Feature | FeatureDescriptor)): void {
