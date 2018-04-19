@@ -156,6 +156,10 @@ export class FeatureManager {
         }
 
         public isEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                // If the feature is not present, return false
+                if (!this.hasFeature(featureIdentifier)) {
+                        return false;
+                }
                 return undefined !== this.getFeatureDescriptor(featureIdentifier).enabled ? !!this.getFeatureDescriptor(featureIdentifier).enabled : false;
         }
         public isDisabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
@@ -175,6 +179,10 @@ export class FeatureManager {
                 return this.setEnabled(featureIdentifier, false);
         }
         public canSetEnabled(featureIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): boolean {
+                // If the feature is not present, return false
+                if (!this.hasFeature(featureIdentifier)) {
+                        return false;
+                }
                 let featureDescriptor = this.getFeatureDescriptor(featureIdentifier);
                 return undefined !== featureDescriptor.toggleCount && 0 !== featureDescriptor.toggleCount;
         }

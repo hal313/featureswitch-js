@@ -914,8 +914,8 @@ describe('FeatureManager', () => {
         this.featureValue = {someValueName: 'someValueValue'};
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.isEnabled(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.isEnabled(this.featureName));
       });
 
       it('should return true when the feature is enabled', () => {
@@ -937,8 +937,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.isDisabled(this.featureName));
+      it('should return true when an unknown feature is requested', () => {
+        assert.isTrue(this.featureManager.isDisabled(this.featureName));
       });
 
       it('should return false when the feature is enabled', () => {
@@ -960,8 +960,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canEnable(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canEnable(this.featureName));
       });
 
       it('should return true if the feature can be enabled', () => {
@@ -988,8 +988,8 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canDisable(this.featureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canDisable(this.featureName));
       });
 
       it('should return true if the feature can be disabled', () => {
@@ -1073,8 +1073,8 @@ describe('FeatureManager', () => {
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.enable(this.enabledFeatureName));
+      it('should throw an error when an unknown feature is requested to be disabled', () => {
+        assert.throw(() => this.featureManager.disable(this.enabledFeatureName));
       });
 
       it('should disable a previously disabled feature', () => {
@@ -1127,8 +1127,8 @@ describe('FeatureManager', () => {
         this.disabledFeature = new Feature(this.disabledFeatureName, false);
       });
 
-      it('should throw an error when an unknown feature is requested', () => {
-        assert.throw(() => this.featureManager.canSetEnabled(this.enabledFeatureName));
+      it('should return false when an unknown feature is requested', () => {
+        assert.isFalse(this.featureManager.canSetEnabled(this.enabledFeatureName));
       });
 
       it('should return false when an enabled feature cannot be set enabled', () => {
