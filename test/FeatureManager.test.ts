@@ -283,6 +283,21 @@ describe('FeatureManager', () => {
         this.featureEnabled = true;
       });
 
+      it('should fail when multiple features are added with the same name', () => {
+        // Base assumption
+        assert.equal(this.featureManager.getFeature(this.featureName), null);
+    
+        // Add a feature
+        this.featureManager.addFeatures([new Feature(this.featureName, this.featureEnabled)]);
+
+        // Add a feature
+        assert.throw(() => {this.featureManager.addFeatures([new Feature(this.featureName, !this.featureEnabled)]);});
+            
+        // Check for equality
+        assert.equal(this.featureManager.getFeature(this.featureName).getName(), this.featureName);
+        assert.equal(this.featureManager.getFeature(this.featureName).isEnabled(), this.featureEnabled);        
+      });
+
       it('should add features by Feature[]', () => {
         // Base assumption
         assert.equal(this.featureManager.getFeature(this.featureName), null);
@@ -1413,7 +1428,7 @@ describe('FeatureManager', () => {
           assert.deepEqual(this.featureManager.getContext(), context);
         });
 
-        describe('Callbacks Called With Context', () => {
+        describe('Callbacks called With Context', () => {
 
           beforeEach(() => {
             this.context = { someValue: true };
@@ -1439,22 +1454,22 @@ describe('FeatureManager', () => {
           });
 
           it('should use the set context during addSource()', () => {
-            this.callbackSpy.returnValue = [new Feature(this.featureName, this.featureDescriptor)];
+            this.callbackSpy.returnValue = [new Feature(this.featureName + '2', this.featureDescriptor)];
             this.featureManager.addSource('someSourceName', this.callbackSpy);
           });
 
           it('should use the set context during setFeatures()', () => {
-            this.callbackSpy.returnValue = [new Feature(this.featureName, this.featureDescriptor)];
+            this.callbackSpy.returnValue = [new Feature(this.featureName + '2', this.featureDescriptor)];
             this.featureManager.setFeatures(this.callbackSpy);
           });
 
           it('should use the set context during addFeature()', () => {
-            this.callbackSpy.returnValue = new Feature(this.featureName, this.featureDescriptor);
+            this.callbackSpy.returnValue = new Feature(this.featureName+ '2', this.featureDescriptor);
             this.featureManager.addFeature(this.callbackSpy);
           });
 
           it('should use the set context during addFeatures()', () => {
-            this.callbackSpy.returnValue = [new Feature(this.featureName, this.featureDescriptor)];
+            //this.callbackSpy.returnValue = [new Feature(this.featureName, this.featureDescriptor)];
             this.featureManager.addFeatures(this.callbackSpy);
           });
 

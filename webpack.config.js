@@ -8,7 +8,7 @@ module.exports = (function(options) {
 
     output: {
       path: __dirname + "/dist",
-
+      libraryTarget: "umd",
       filename: "FeatureManager.js",
       library: "FeatureManager"
     },

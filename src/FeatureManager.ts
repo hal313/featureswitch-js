@@ -74,6 +74,12 @@ export class FeatureManager {
 
         public addFeature(featureIdentifier: Feature | FeatureDescriptor | any | ((context: Object) => Feature | FeatureDescriptor)): void {
                 let normalizedFeature = this.normalizeFeatureish(this.normalizeValue(featureIdentifier));
+
+                // Check that the feature does not exist
+                if (!!this.features[normalizedFeature.name]) {                        
+                        throw new Error(`Cannot add feature ('${normalizedFeature.name}') because it already exists`);
+                }
+
                 this.features[normalizedFeature.name] = normalizedFeature;
         }
 
