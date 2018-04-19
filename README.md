@@ -7,7 +7,7 @@
 > JavaScript implementation of a feature switch library
 
 ## Introduction
-This package provides basic feature switch functionality for JavaScript projects. It allows for multiple feature managers to exist at the same time, each with their own set of features and context.
+This package provides basic featur  e switch functionality for JavaScript projects. It allows for multiple feature managers to exist at the same time, each with their own set of features and context.
 
 Features can be configured as simple features which are either enabled or disabled. Alternatively, features may be configured to be enabled or disabled a specific number of times before being locked. As well, features may contain values in addition to an enabled state. This allows for the ability to reduce the number of features which provide some value.
 
@@ -68,12 +68,14 @@ $ npm run test:watch    # Run unit tests with Mocha, and watch files for changes
 $ npm run coverage    # Run unit tests with code coverage by Istanbul
 ```
 
-### License
+## License
 [MIT](https://raw.githubusercontent.com/hal313/featureswitch-js/master/LICENSE)
 
+## Table Of Contents
 - [featureswitch-js](#featureswitch-js)
     - [Introduction](#introduction)
     - [Installing](#installing)
     - [Usage](#usage)
     - [Running Tests](#running-tests)
-        - [License](#license)
+    - [License](#license)
+    - [Table Of Contents](#table-of-contents)
