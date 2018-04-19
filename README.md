@@ -23,5 +23,4 @@ $ npm run test:cover    # Run unit tests with code coverage by Istanbul
 ```
 
 ### License
-
-MIT © 2018 John R. Ghidiu
+[MIT](https://raw.githubusercontent.com/hal313/featureswitch-js/master/LICENSE)
