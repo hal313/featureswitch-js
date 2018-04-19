@@ -70,3 +70,10 @@ $ npm run coverage    # Run unit tests with code coverage by Istanbul
 
 ### License
 [MIT](https://raw.githubusercontent.com/hal313/featureswitch-js/master/LICENSE)
+
+- [featureswitch-js](#featureswitch-js)
+    - [Introduction](#introduction)
+    - [Installing](#installing)
+    - [Usage](#usage)
+    - [Running Tests](#running-tests)
+        - [License](#license)
