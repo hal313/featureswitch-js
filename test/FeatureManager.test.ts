@@ -10,6 +10,11 @@ describe('FeatureManager', () => {
     this.featureManager = new FeatureManager();
   });
 
+  // describe('context', () => {
+  //   it.only('should not show context', () => {
+  //     console.log('here', this.featureManager);
+  //   });
+  // });
 
   describe('API', () => {
 

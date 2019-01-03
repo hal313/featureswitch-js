@@ -48,8 +48,20 @@
 
 export class FeatureManager {
 
-        private features:any  = {};
-        private context = {};
+        // private features:any  = {};
+        // private context = {};
+
+        // TODO: Append to getInternalContext
+        private memberContainer() {};
+        private internalContext = function internalContext(context: any = {}) {
+                if (!context) {
+                        this.internalContext['context'] = {} || this['context'];
+                } else {
+                        this.internalContext['context'] = context;
+                }
+                return this.internalContext['context'];
+        }
+
         private featureDecriptorDecorator: (featureDescriptor: FeatureDescriptor, context: Object) => FeatureDescriptor;
 
         public addSource(name: string, source: (context: Object) => Feature[] | FeatureDescriptor[]) {
@@ -76,11 +88,11 @@ export class FeatureManager {
                 let normalizedFeature = this.normalizeFeatureish(this.normalizeValue(featureIdentifier));
 
                 // Check that the feature does not exist
-                if (!!this.features[normalizedFeature.name]) {                        
+                if (!!this.memberContainer.features[normalizedFeature.name]) {                        
                         throw new Error(`Cannot add feature ('${normalizedFeature.name}') because it already exists`);
                 }
 
-                this.features[normalizedFeature.name] = normalizedFeature;
+                this.memberContainer.features[normalizedFeature.name] = normalizedFeature;
         }
 
         public removeFeatures(featureIdentifiers: string[] | Feature[] | FeatureDescriptor[] | ((context: Object) => string[] | Feature[] | FeatureDescriptor[])): void {
@@ -92,7 +104,7 @@ export class FeatureManager {
                         
                 let name = this.getName(featureIdentifier);
                 if (!!name) {
-                        delete this.features[name];
+                        delete this.memberContainer.features[name];
                 }
         }
         public removeAllFeatures(): void {
@@ -108,10 +120,14 @@ export class FeatureManager {
                         }
                 });
 
-                this.context = FeatureManager.clone(context);
+                //this.context = FeatureManager.clone(context);
+                //this.memberContainer['context'] = FeatureManager.clone(context);
+                this.internalContext(FeatureManager.clone(context));
         }
         public getContext(): Object {
-                return FeatureManager.clone(this.context);
+                // return FeatureManager.clone(this.context);
+                // return FeatureManager.clone(this.memberContainer.context);
+                return FeatureManager.clone(this.internalContext());
         }
         
         public getAllFeatures(): Feature[] {
@@ -119,7 +135,7 @@ export class FeatureManager {
                 // return this.features.map(this.getFeature(featureDescriptor.name));
                 
                 let features: Feature[] = [];
-                Object.getOwnPropertyNames(this.features).forEach((name: string) => {
+                Object.getOwnPropertyNames(this.memberContainer.features).forEach((name: string) => {
                         features.push(this.getFeature(name));
                 });
                 return features;
@@ -276,7 +292,7 @@ export class FeatureManager {
         }
 
         private getFeatureDescriptor(featureDescriptorIdentifier: string | Feature | FeatureDescriptor | ((context: Object) => string | Feature | FeatureDescriptor)): FeatureDescriptor {
-                let featureDescriptor = this.features[this.getName(this.normalizeValue(featureDescriptorIdentifier))];
+                let featureDescriptor = this.memberContainer.features[this.getName(this.normalizeValue(featureDescriptorIdentifier))];
 
                 if (!featureDescriptor && FeatureManager.isFeatureDescriptor(featureDescriptorIdentifier)) {
                         featureDescriptor = featureDescriptorIdentifier;
