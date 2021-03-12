@@ -4,6 +4,8 @@
 [![NPM version](http://img.shields.io/npm/v/featureswitch-js.svg?style=flat-square)](https://www.npmjs.com/package/featureswitch-js)
 [![Dependency Status](http://img.shields.io/david/hal313/featureswitch-js.svg?style=flat-square)](https://david-dm.org/hal313/featureswitch-js)
 
+> This project has been deprecated. Please use [feature-switch-core](https://github.com/hal313/featureswitch-js-functional-example) moving forward.
+
 > JavaScript implementation of a feature switch library
 
 ### How to Install
